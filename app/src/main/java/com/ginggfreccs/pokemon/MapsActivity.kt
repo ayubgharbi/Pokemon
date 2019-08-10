@@ -32,7 +32,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
+        loadPockemons()
         checkPermisions()
     }
 
@@ -92,8 +92,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-
     }
 
     var myLocation:Location?=null
@@ -119,15 +117,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    var oldLocation:Location?=null
     inner class MyThread:Thread{
         constructor():super(){
-            //TODO:see old location
+            oldLocation= Location("oldLocation")
+            oldLocation!!.longitude=0.0
+            oldLocation!!.latitude=0.0
         }
 
         override fun run() {
 
             while(true){
                 try {
+
+                    if(oldLocation!!.distanceTo(myLocation)==0f){
+                        continue
+                    }
+                    oldLocation=myLocation
 
                 runOnUiThread {
                     mMap.clear()
@@ -139,15 +145,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         .snippet("here is my location")
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.mario)))
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,16f))
+
+                    //show pockemons
+                    for(i in 0..listOfPockemons.size-1){
+
+                        var newPockemon=listOfPockemons[i]
+
+                        if(newPockemon.isCatch==false){
+
+                            val pockLocation = LatLng(newPockemon.location!!.latitude, newPockemon.location!!.longitude)
+                            mMap.addMarker(MarkerOptions()
+                                .position(pockLocation)
+                                .title(newPockemon.name)
+                                .snippet(newPockemon.des+", power:"+ newPockemon.power)
+                                .icon(BitmapDescriptorFactory.fromResource(newPockemon.image!!)))
+                        }
+                    }
                 }
 
                 Thread.sleep(1000)
                 }catch (ex:Exception){}
 
-
-
-
             }
         }
+    }
+
+    var listOfPockemons=ArrayList<Pockemon>()
+    fun loadPockemons(){
+
+        listOfPockemons.add(Pockemon(R.drawable.charmander,"Charmander",
+            "Charmander living in japan",55.0,41.0086673,28.9802921))
+        listOfPockemons.add(Pockemon(R.drawable.bulbasaur,"Bulbasaur",
+            "Bulbasaur living in usa",90.5,41.0066867,28.9763698))
+        listOfPockemons.add(Pockemon(R.drawable.squirtle,"Squirlle",
+            "Squirtle living in iraq",33.5,41.0043668,28.9773204))
     }
 }

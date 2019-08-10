@@ -1,4 +1,4 @@
-#Sat Aug 10 17:54:11 WEST 2019
+#Sat Aug 10 19:23:31 WEST 2019
 base.0=/home/ging/Desktop/YoutubeDemos/Pokemon/app/build/intermediates/dex/debug/out/classes.dex
 path.0=classes.dex
 renamed.0=classes.dex
